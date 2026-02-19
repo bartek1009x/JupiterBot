@@ -23,7 +23,15 @@ const int MAX_RESPONSE_INDEX = 11;
 void handle_command(struct discord *client, const struct discord_message *event) {
     if (strcmp(event->content, "CLANKER") == 0 && event->author->id == REAL_JUPITER_ID) {
         int random_response_index = rand() % (MAX_RESPONSE_INDEX - MIN_REPONSE_INDEX + 1) + MIN_REPONSE_INDEX;
-        struct discord_create_message params = { .content = jupiter_responses[random_response_index]};
+        struct discord_message_reference ref = {
+            .message_id = event->id,
+            .channel_id = event->channel_id,
+            .guild_id = event->guild_id
+        };
+        struct discord_create_message params = {
+            .content = jupiter_responses[random_response_index],
+            .message_reference = &ref
+        };
         discord_create_message(client, event->channel_id, &params, NULL);
     }
 }
