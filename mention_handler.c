@@ -8,13 +8,13 @@ void send_ping_message(struct discord *client, const struct discord_message *eve
     discord_create_message(client, event->channel_id, &params, NULL);
 }
 
-void handle_mentions(struct discord *client, const struct discord_message *event) {
+bool handle_mentions(struct discord *client, const struct discord_message *event) {
     if (event->mentions->size > 0) {
         for (int i = 0; i < event->mentions->size; i++) {
             struct discord_user mentionedUser = event->mentions->array[i];
-            if (mentionedUser.id == ID) {
+            if (mentionedUser.id == BOT_USER_ID) {
                 send_ping_message(client, event);
-                break;
+                return true;
             }
         }
     } else if (event->mention_roles->size > 0) {
@@ -25,15 +25,13 @@ void handle_mentions(struct discord *client, const struct discord_message *event
         for (int i = 0; i < event->mention_roles->size; i++) {
             u64snowflake mentionedRole = event->mention_roles->array[i];
 
-            bool shouldBreak = false;
             for (int j = 0; j < roles.size; j++) {
                 if (roles.array[j].id == mentionedRole && roles.array[j].managed && strcmp(roles.array[j].name, "JupiterBot") == 0) {
                     send_ping_message(client, event);
-                    shouldBreak = true;
-                    break;
+                    return true;
                 }
             }
-            if (shouldBreak) break;
         }
     }
+    return false;
 }

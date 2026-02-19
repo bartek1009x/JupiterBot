@@ -3,13 +3,16 @@
 #include <concord/log.h>
 #include <stdlib.h>
 #include "mention_handler.h"
+#include "command_handler.h"
 
 void on_ready(struct discord *client, const struct discord_ready *event) {
     log_info("Logged in as %s!", event->user->username);
 }
 
 void on_message(struct discord *client, const struct discord_message *event) {
-    handle_mentions(client, event);
+    if (handle_mentions(client, event)) return;
+
+    handle_command(client, event);
 }
 
 int main() {
